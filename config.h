@@ -9,18 +9,18 @@ static int colorprompt = 1;                /* -p  option; if 1, prompt uses Sche
 static int min_width = 500;                    /* minimum width when centered */
 /* -fn option overrides fonts[0]; default X11 font or font set */
 static const char *fonts[] = {
-	"FiraMono Nerd Font Mono:pixelsize=16:antialias=true:autohint=true",
-	"joypixels:pixelsize=14:antialias=true:autohint=true"
+    "Operator Mono SSm Lig:pixelsize=16:antialias=true:autohint=true",
+    "joypixels:pixelsize=14:antialias=true:autohint=true"
 };
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
 static const char *colors[SchemeLast][2] = {
-	/*                        fg         bg       */
-	[SchemeNorm] =          { "#f0f0f0", "#1E1C31" },
-	[SchemeSel] =           { "#ffffff", "#7986E7" },
-	[SchemeOut] =           { "#000000", "#000000" },
-	[SchemeMid] =           { "#f0f0f0", "#12111E" },
-	[SchemeSelHighlight] =  { "#f0f0f0", "#161616" },
-	[SchemeNormHighlight] = { "#ff5370", "#12111E" },
+    /*                        fg         bg       */
+    [SchemeNorm] =          { "#f0f0f0", "#1E1C31" },
+    [SchemeSel] =           { "#ffffff", "#7986E7" },
+    [SchemeOut] =           { "#000000", "#000000" },
+    [SchemeMid] =           { "#f0f0f0", "#12111E" },
+    [SchemeSelHighlight] =  { "#f0f0f0", "#161616" },
+    [SchemeNormHighlight] = { "#ff5370", "#12111E" },
 };
 /* -l and -g options; controls number of lines and columns in grid if > 0 */
 static unsigned int lines      = 0;

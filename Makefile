@@ -31,8 +31,8 @@ clean:
 dist: clean
 	mkdir -p dmenu-$(VERSION)
 	cp LICENSE Makefile README arg.h config.h config.mk dmenu.1\
-		drw.h util.h dmenu_path dmenu_run stest.1 $(SRC)\
-		dmenu-$(VERSION)
+	    drw.h util.h dmenu_path dmenu_run stest.1 $(SRC)\
+	    dmenu-$(VERSION)
 	tar -cf dmenu-$(VERSION).tar dmenu-$(VERSION)
 	gzip dmenu-$(VERSION).tar
 	rm -rf dmenu-$(VERSION)
@@ -52,10 +52,10 @@ install: all
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/dmenu\
-		$(DESTDIR)$(PREFIX)/bin/dmenu_path\
-		$(DESTDIR)$(PREFIX)/bin/dmenu_run\
-		$(DESTDIR)$(PREFIX)/bin/stest\
-		$(DESTDIR)$(MANPREFIX)/man1/dmenu.1\
-		$(DESTDIR)$(MANPREFIX)/man1/stest.1
+	    $(DESTDIR)$(PREFIX)/bin/dmenu_path\
+	    $(DESTDIR)$(PREFIX)/bin/dmenu_run\
+	    $(DESTDIR)$(PREFIX)/bin/stest\
+	    $(DESTDIR)$(MANPREFIX)/man1/dmenu.1\
+	    $(DESTDIR)$(MANPREFIX)/man1/stest.1
 
 .PHONY: all options clean dist install uninstall
