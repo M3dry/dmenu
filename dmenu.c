@@ -26,6 +26,8 @@
                              * MAX(0, MIN((y)+(h),(r).y_org+(r).height) - MAX((y),(r).y_org)))
 #define LENGTH(X)             (sizeof X / sizeof X[0])
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
+#define OPAQUE                0xffU
+#define OPACITY               "_NET_WM_WINDOW_OPACITY"
 
 /* enums */
 enum { SchemeNorm, SchemeSel, SchemeNormHighlight, SchemeSelHighlight, SchemeMid,
@@ -55,6 +57,11 @@ static Atom clip, utf8;
 static Display *dpy;
 static Window root, parentwin, win;
 static XIC xic;
+
+static int useargb = 0;
+static Visual *visual;
+static int depth;
+static Colormap cmap;
 
 static Drw *drw;
 static Clr *scheme[SchemeLast];
@@ -753,6 +760,43 @@ paste(void)
 }
 
 static void
+xinitvisual()
+{
+	XVisualInfo *infos;
+	XRenderPictFormat *fmt;
+	int nitems;
+	int i;
+
+	XVisualInfo tpl = {
+		.screen = screen,
+		.depth = 32,
+		.class = TrueColor
+	};
+	long masks = VisualScreenMask | VisualDepthMask | VisualClassMask;
+
+	infos = XGetVisualInfo(dpy, masks, &tpl, &nitems);
+	visual = NULL;
+	for(i = 0; i < nitems; i ++) {
+		fmt = XRenderFindVisualFormat(dpy, infos[i].visual);
+		if (fmt->type == PictTypeDirect && fmt->direct.alphaMask) {
+			visual = infos[i].visual;
+			depth = infos[i].depth;
+			cmap = XCreateColormap(dpy, root, visual, AllocNone);
+			useargb = 1;
+			break;
+		}
+	}
+
+	XFree(infos);
+
+	if (! visual) {
+		visual = DefaultVisual(dpy, screen);
+		depth = DefaultDepth(dpy, screen);
+		cmap = DefaultColormap(dpy, screen);
+	}
+}
+
+static void
 readstdin(void)
 {
     char buf[sizeof text], *p;
@@ -836,7 +880,7 @@ setup(void)
 #endif
     /* init appearance */
     for (j = 0; j < SchemeLast; j++)
-        scheme[j] = drw_scm_create(drw, colors[j], 2);
+		scheme[j] = drw_scm_create(drw, colors[j], alphas[j], 2);
 
     clip = XInternAtom(dpy, "CLIPBOARD",   False);
     utf8 = XInternAtom(dpy, "UTF8_STRING", False);
@@ -906,15 +950,15 @@ setup(void)
 
     /* create menu window */
     swa.override_redirect = managed ? False : True;
-    swa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
+	swa.background_pixel = 0;
+	swa.colormap = cmap;
     swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
     win = XCreateWindow(dpy, parentwin, x, y, mw, mh, border_width,
-                        CopyFromParent, CopyFromParent, CopyFromParent,
-                        CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
+	                    depth, InputOutput, visual,
+	                    CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa);
     if (border_width)
         XSetWindowBorder(dpy, win, scheme[SchemeSel][ColBg].pixel);
     XSetClassHint(dpy, win, &ch);
-
 
     /* input methods */
     if ((xim = XOpenIM(dpy, NULL, NULL, NULL)) == NULL)
@@ -953,7 +997,7 @@ static void
 usage(void)
 {
     fputs("usage: dmenu [-bfinv] [-l lines] [-h height] [-p prompt] [-fn font] [-m monitor]\n"
-          "             [-nb color] [-nf color] [-sb color] [-sf color]\n"
+          "             [-nb color] [-nf color] [-sb color] [-sf color] [-o opacity]\n"
           "             [-nhb color] [-nhf color] [-shb color] [-shf color] [-w windowid]\n", stderr);
     exit(1);
 }
@@ -1001,6 +1045,8 @@ main(int argc, char *argv[])
             mon = atoi(argv[++i]);
         else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
             prompt = argv[++i];
+		else if (!strcmp(argv[i], "-o"))  /* opacity */
+			opacity = atof(argv[++i]);
         else if (!strcmp(argv[i], "-fn"))  /* font or font set */
             fonts[0] = argv[++i];
         else if (!strcmp(argv[i], "-nb"))  /* normal background color */
@@ -1037,7 +1083,8 @@ main(int argc, char *argv[])
     if (!XGetWindowAttributes(dpy, parentwin, &wa))
         die("could not get embedding window attributes: 0x%lx",
             parentwin);
-    drw = drw_create(dpy, screen, root, wa.width, wa.height);
+	xinitvisual();
+	drw = drw_create(dpy, screen, root, wa.width, wa.height, visual, depth, cmap);
     if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
         die("no fonts could be loaded.");
     lrpad = drw->fonts->h;

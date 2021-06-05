@@ -2,26 +2,40 @@
 /* Default settings; can be overriden by command line. */
 
 static int instant = 0;
-static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom     */
-static int centered = 0;                    /* -c option; centers dmenu on screen */
+static int topbar = 1;                     /* -b  option; if 0, dmenu appears at bottom     */
+static int centered = 0;                   /* -c option; centers dmenu on screen */
 static int fuzzy = 0;                      /* -F  option; if 0, dmenu doesn't use fuzzy matching     */
 static int colorprompt = 1;                /* -p  option; if 1, prompt uses SchemeSel, otherwise SchemeNorm */
-static int min_width = 500;                    /* minimum width when centered */
-/* -fn option overrides fonts[0]; default X11 font or font set */
+static int min_width = 500;                /* minimum width when centered */
+static double opacity = 1.0;               /* -o  option; defines alpha translucency        */
 static const char *fonts[] = {
     "Operator Mono SSm Lig:pixelsize=16:antialias=true:autohint=true",
     "joypixels:pixelsize=14:antialias=true:autohint=true"
 };
+
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
 static const char *colors[SchemeLast][2] = {
     /*                        fg         bg       */
-    [SchemeNorm] =          { "#f0f0f0", "#1E1C31" },
-    [SchemeSel] =           { "#ffffff", "#7986E7" },
+    [SchemeNorm] =          { "#eeffff", "#0f111b" },
+    [SchemeSel] =           { "#ffffff", "#7986e7" },
     [SchemeOut] =           { "#000000", "#000000" },
-    [SchemeMid] =           { "#f0f0f0", "#12111E" },
-    [SchemeSelHighlight] =  { "#f0f0f0", "#161616" },
-    [SchemeNormHighlight] = { "#ff5370", "#12111E" },
+    [SchemeMid] =           { "#eeffff", "#1e1c31" },
+    [SchemeSelHighlight] =  { "#ff5370", "#7986e7" },
+    [SchemeNormHighlight] = { "#ff5370", "#0f111b" },
 };
+
+static const unsigned int baralpha = OPAQUE;
+static const unsigned int borderalpha = OPAQUE;
+static const unsigned int alphas[][3]      = {
+	/*                        fg      bg        border     */
+	[SchemeNorm]          = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel]           = { OPAQUE, baralpha, borderalpha },
+	[SchemeOut]           = { OPAQUE, baralpha, borderalpha },
+	[SchemeMid]           = { OPAQUE, baralpha, borderalpha },
+	[SchemeSelHighlight]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeNormHighlight] = { OPAQUE, baralpha, borderalpha },
+};
+
 /* -l and -g options; controls number of lines and columns in grid if > 0 */
 static unsigned int lines      = 0;
 static unsigned int columns    = 0;
