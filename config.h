@@ -2,12 +2,12 @@
 /* Default settings; can be overriden by command line. */
 
 static int instant = 0;
-static int topbar = 1;                     /* -b  option; if 0, dmenu appears at bottom     */
+static int topbar = 1;                     /* -b  option; if 0, dmenu appears at bottom */
 static int centered = 0;                   /* -c option; centers dmenu on screen */
-static int fuzzy = 0;                      /* -F  option; if 0, dmenu doesn't use fuzzy matching     */
+static int fuzzy = 0;                      /* -F  option; if 0, dmenu doesn't use fuzzy matching */
 static int colorprompt = 1;                /* -p  option; if 1, prompt uses SchemeSel, otherwise SchemeNorm */
 static int min_width = 500;                /* minimum width when centered */
-static double opacity = 1.0;               /* -o  option; defines alpha translucency        */
+static int opacity = 0;                    /* -o  option; if 0, then alpha is disabled */
 static const char *fonts[] = {
     "Operator Mono SSm Lig:pixelsize=16:antialias=true:autohint=true",
     "joypixels:pixelsize=14:antialias=true:autohint=true"

@@ -792,7 +792,7 @@ xinitvisual()
 
 	XFree(infos);
 
-	if (! visual) {
+	if (!visual || !opacity) {
 		visual = DefaultVisual(dpy, screen);
 		depth = DefaultDepth(dpy, screen);
 		cmap = DefaultColormap(dpy, screen);
@@ -1018,7 +1018,7 @@ main(int argc, char *argv[])
             puts("dmenu-"VERSION);
             exit(0);
         } else if (!strcmp(argv[i], "-b")) /* appears at the bottom of the screen */
-            topbar = 0;
+            topbar = !topbar;
         else if (!strcmp(argv[i], "-f"))   /* grabs keyboard before reading stdin */
             fast = 1;
         else if (!strcmp(argv[i], "-F"))   /* grabs keyboard before reading stdin */
@@ -1056,7 +1056,7 @@ main(int argc, char *argv[])
         else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
             prompt = argv[++i];
 		else if (!strcmp(argv[i], "-o"))  /* opacity */
-			opacity = atof(argv[++i]);
+			opacity = atoi(argv[++i]);
         else if (!strcmp(argv[i], "-fn"))  /* font or font set */
             fonts[0] = argv[++i];
         else if (!strcmp(argv[i], "-nb"))  /* normal background color */
