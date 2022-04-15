@@ -109,38 +109,39 @@ calcoffsets(void)
 static void
 drawhighlights(struct item *item, int x, int y, int maxw)
 {
-    char restorechar, tokens[sizeof text], *highlight,  *token;
-    int indentx, highlightlen;
+	int i, indent;
+	char *highlight;
+	char c;
 
-    drw_setscheme(drw, scheme[item == sel ? SchemeSelHighlight : SchemeNormHighlight]);
-    strcpy(tokens, text);
-    for (token = strtok(tokens, " "); token; token = strtok(NULL, " ")) {
-        highlight = fstrstr(item->text, token);
-        while (highlight) {
-            // Move item str end, calc width for highlight indent, & restore
-            highlightlen = highlight - item->text;
-            restorechar = *highlight;
-            item->text[highlightlen] = '\0';
-            indentx = TEXTW(item->text);
-            item->text[highlightlen] = restorechar;
+	if (!(strlen(item->text) && strlen(text)))
+		return;
 
-            // Move highlight str end, draw highlight, & restore
-            restorechar = highlight[strlen(token)];
-            highlight[strlen(token)] = '\0';
-            if (indentx - (lrpad / 2) - 1 < maxw)
-                drw_text(
-                    drw,
-                    x + indentx - (lrpad / 2) - 1,
-                    y,
-                    MIN(maxw - indentx, TEXTW(highlight) - lrpad),
-                    bh, 0, highlight, 0
-                );
-            highlight[strlen(token)] = restorechar;
+	drw_setscheme(drw, scheme[item == sel
+	                   ? SchemeSelHighlight
+	                   : SchemeNormHighlight]);
+	for (i = 0, highlight = item->text; *highlight && text[i];) {
+		if (*highlight == text[i]) {
+			/* get indentation */
+			c = *highlight;
+			*highlight = '\0';
+			indent = TEXTW(item->text);
+			*highlight = c;
 
-            if (strlen(highlight) - strlen(token) < strlen(token)) break;
-            highlight = fstrstr(highlight + strlen(token), token);
-        }
-    }
+			/* highlight character */
+			c = highlight[1];
+			highlight[1] = '\0';
+			drw_text(
+				drw,
+				x + indent - (lrpad / 2),
+				y,
+				MIN(maxw - indent, TEXTW(highlight) - lrpad),
+				bh, 0, highlight, 0
+			);
+			highlight[1] = c;
+			i++;
+		}
+		highlight++;
+	}
 }
 
 static int
@@ -956,7 +957,7 @@ setup(void)
 	swa.background_pixel = 0;
 	swa.colormap = cmap;
     swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask;
-    win = XCreateWindow(dpy, parentwin, x, y, mw, mh, border_width,
+    win = XCreateWindow(dpy, parentwin, x, y - (topbar ? 0 : border_width * 2), mw - border_width * 2, mh, border_width,
 	                    depth, InputOutput, visual,
 	                    CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa);
     if (border_width)
@@ -1021,7 +1022,7 @@ main(int argc, char *argv[])
             topbar = !topbar;
         else if (!strcmp(argv[i], "-f"))   /* grabs keyboard before reading stdin */
             fast = 1;
-        else if (!strcmp(argv[i], "-F"))   /* grabs keyboard before reading stdin */
+        else if (!strcmp(argv[i], "-F"))   /* fuzzy matching */
             fuzzy = 1;
         else if (!strcmp(argv[i], "-c"))   /* centers dmenu on screen */
             centered = 1;
