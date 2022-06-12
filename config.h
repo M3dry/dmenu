@@ -9,7 +9,7 @@ static int colorprompt = 1;                /* -p  option; if 1, prompt uses Sche
 static int min_width = 500;                /* minimum width when centered */
 static int opacity = 0;                    /* -o  option; if 0, then alpha is disabled */
 static const char *fonts[] = {
-    "Operator Mono SSm Lig Book:pixelsize=16:antialias=true:autohint=true",
+    "UbuntuMono Nerd Font:pixelsize=16:antialias=true:autohint=true",
     "joypixels:pixelsize=14:antialias=true:autohint=true"
 };
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
